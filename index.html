@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TradeX Terminal - FYERS</title>
+    <title>DealX Terminal</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
 </head>
 <body>
     <div id="loginScreen" class="login-screen">
         <div class="login-box">
-            <h1>TradeX Terminal</h1>
-            <p>Fastest Web Terminal for FYERS</p>
-            <button onclick="loginWithFyers()">Login with FYERS</button>
+            <h1>DealX Terminal</h1>
+            <p>Deal Fast. Deal Smart.</p>
+            <input type="text" id="appIdInput" placeholder="Enter FYERS App ID" style="margin-bottom:15px; padding:12px; border-radius:8px; border:1px solid #30363d; background:#0d1117; color:#c9d1d9; width:100%; font-size:14px;">
+            <button id="loginBtn" onclick="loginWithFyers()">Login with FYERS</button>
         </div>
     </div>
 
     <div id="terminalScreen" class="terminal hidden">
         <header class="topbar">
-            <div class="logo">TradeX</div>
+            <div class="logo">DealX</div>
             <div class="user-info">
                 <span id="userName"></span>
                 <button onclick="logout()">Logout</button>
@@ -46,14 +46,14 @@
                 <div class="order-panel">
                     <h3>Place Order</h3>
                     <div class="order-form">
-                        <input type="text" id="orderSymbol" placeholder="Symbol (e.g. NSE:RELIANCE-EQ)">
+                        <input type="text" id="orderSymbol" placeholder="Symbol (NSE:RELIANCE-EQ)">
                         <input type="number" id="orderQty" placeholder="Quantity">
                         <select id="orderType">
                             <option value="1">Market</option>
                             <option value="2">Limit</option>
                             <option value="3">Stop Loss</option>
                         </select>
-                        <input type="number" id="orderPrice" placeholder="Price (for limit)">
+                        <input type="number" id="orderPrice" placeholder="Price">
                         <div class="order-buttons">
                             <button class="buy-btn" onclick="placeOrder(1)">BUY</button>
                             <button class="sell-btn" onclick="placeOrder(-1)">SELL</button>
