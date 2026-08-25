@@ -243,6 +243,8 @@ function logout() {
     location.reload();
 }
 
+let fyersConnect = null;
+
 window.onload = function() {
     const savedToken = localStorage.getItem('accessToken');
     if (savedToken) {
@@ -256,3 +258,31 @@ window.onload = function() {
         handleCallback();
     }
 };
+
+function loginWithFyers() {
+    fyersConnect = new FyersApiConnect({
+        appId: localStorage.getItem('fyersAppId'),
+        redirectUri: window.location.origin + '/callback'
+    });
+    
+    fyersConnect.login();
+}
+
+function handleCallback() {
+    fyersConnect = new FyersApiConnect({
+        appId: localStorage.getItem('fyersAppId'),
+        redirectUri: window.location.origin + '/callback'
+    });
+    
+    fyersConnect.handleCallback(function(response) {
+        if (response.status === 'success') {
+            accessToken = response.access_token;
+            localStorage.setItem('accessToken', accessToken);
+            showTerminal();
+            loadUserProfile();
+            startWebSocket();
+            loadOrders();
+            loadPositions();
+        }
+    });
+}
