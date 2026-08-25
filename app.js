@@ -4,6 +4,20 @@ let watchlist = ['NSE:RELIANCE-EQ', 'NSE:TCS-EQ', 'NSE:INFY-EQ', 'NSE:HDFCBANK-E
 let currentSymbol = 'NSE:RELIANCE-EQ';
 let ws = null;
 
+window.onload = function() {
+    const savedToken = localStorage.getItem('accessToken');
+    if (savedToken) {
+        accessToken = savedToken;
+        showTerminal();
+        loadUserProfile();
+        startWebSocket();
+        loadOrders();
+        loadPositions();
+    } else if (window.location.pathname === '/callback') {
+        handleCallback();
+    }
+};
+
 function loginWithFyers() {
     const appId = document.getElementById('appIdInput').value.trim();
     if (!appId) { alert('FYERS App ID daalo!'); return; }
@@ -20,26 +34,33 @@ function loginWithFyers() {
     window.location.href = authUrl;
 }
 
-async function handleCallback() {
+function handleCallback() {
     const urlParams = new URLSearchParams(window.location.search);
     const authCode = urlParams.get('auth_code');
     
     if (authCode) {
-        const clientId = localStorage.getItem('clientId');
-        const response = await fetch('/api/token', {
+        fetch('/api/token', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ authCode, clientId })
+            body: JSON.stringify({ authCode: authCode })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.access_token) {
+                accessToken = data.access_token;
+                localStorage.setItem('accessToken', accessToken);
+                showTerminal();
+                loadUserProfile();
+                startWebSocket();
+                loadOrders();
+                loadPositions();
+            } else {
+                alert('Login failed: ' + JSON.stringify(data));
+            }
+        })
+        .catch(e => {
+            alert('Error: ' + e.message);
         });
-        
-        const data = await response.json();
-        if (data.access_token) {
-            accessToken = data.access_token;
-            localStorage.setItem('accessToken', accessToken);
-            showTerminal();
-            loadUserProfile();
-            startWebSocket();
-        }
     }
 }
 
@@ -180,7 +201,7 @@ async function placeOrder(side) {
         
         const data = await response.json();
         if (data.s === 'ok') {
-            alert('Order placed successfully! ID: ' + data.id);
+            alert('Order placed! ID: ' + data.id);
             loadOrders();
             loadPositions();
         } else {
@@ -205,7 +226,7 @@ async function loadOrders() {
                     '<span>' + order.symbol + '</span>' +
                     '<span>' + (order.side === 1 ? 'BUY' : 'SELL') + '</span>' +
                     '<span>Qty: ' + order.qty + '</span>' +
-                    '<span style="color:' + (order.status === 1 ? 'var(--green)' : 'var(--red)') + '">' + order.statusText + '</span>' +
+                    '<span>' + (order.statusText || order.status) + '</span>' +
                 '</div>';
             }).join('');
         } else {
@@ -245,63 +266,7 @@ async function loadPositions() {
 function logout() {
     accessToken = null;
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('fyersAppId');
     if (ws) ws.close();
-    location.reload();
-}
-
-let fyersConnect = null;
-
-window.onload = function() {
-    const savedToken = localStorage.getItem('accessToken');
-    if (savedToken) {
-        accessToken = savedToken;
-        showTerminal();
-        loadUserProfile();
-        startWebSocket();
-        loadOrders();
-        loadPositions();
-    } else if (window.location.pathname === '/callback') {
-        handleCallback();
-    }
-};
-
-function loginWithFyers() {
-    fyersConnect = new FyersApiConnect({
-        appId: localStorage.getItem('fyersAppId'),
-        redirectUri: window.location.origin + '/callback'
-    });
-    
-    fyersConnect.login();
-}
-
-function handleCallback() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const authCode = urlParams.get('auth_code');
-    
-    if (authCode) {
-        const appId = localStorage.getItem('fyersAppId');
-        
-        fetch('/api/token', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ authCode: authCode, appId: appId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.access_token) {
-                accessToken = data.access_token;
-                localStorage.setItem('accessToken', accessToken);
-                showTerminal();
-                loadUserProfile();
-                startWebSocket();
-                loadOrders();
-                loadPositions();
-            } else {
-                alert('Login failed: ' + (data.message || 'Error'));
-            }
-        })
-        .catch(e => {
-            alert('Error: ' + e.message);
-        });
-    }
+    location.href = '/';
 }
