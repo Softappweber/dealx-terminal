@@ -79,3 +79,8 @@ app.get('/api/positions', async (req, res) => {
 app.listen(PORT, () => {
     console.log('TradeX Terminal running on port ' + PORT);
 });
+
+// Callback route - FYERS se redirect yahan aayega
+app.get('/callback', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
