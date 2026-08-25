@@ -1,0 +1,2 @@
+# dealx-terminal
+Generated project
