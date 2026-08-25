@@ -275,20 +275,33 @@ function loginWithFyers() {
 }
 
 function handleCallback() {
-    fyersConnect = new FyersApiConnect({
-        appId: localStorage.getItem('fyersAppId'),
-        redirectUri: window.location.origin + '/callback'
-    });
+    const urlParams = new URLSearchParams(window.location.search);
+    const authCode = urlParams.get('auth_code');
     
-    fyersConnect.handleCallback(function(response) {
-        if (response.status === 'success') {
-            accessToken = response.access_token;
-            localStorage.setItem('accessToken', accessToken);
-            showTerminal();
-            loadUserProfile();
-            startWebSocket();
-            loadOrders();
-            loadPositions();
-        }
-    });
+    if (authCode) {
+        const appId = localStorage.getItem('fyersAppId');
+        
+        fetch('/api/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ authCode: authCode, appId: appId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.access_token) {
+                accessToken = data.access_token;
+                localStorage.setItem('accessToken', accessToken);
+                showTerminal();
+                loadUserProfile();
+                startWebSocket();
+                loadOrders();
+                loadPositions();
+            } else {
+                alert('Login failed: ' + (data.message || 'Error'));
+            }
+        })
+        .catch(e => {
+            alert('Error: ' + e.message);
+        });
+    }
 }
