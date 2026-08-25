@@ -14,7 +14,10 @@ const FYERS_BASE = 'https://api-t1.fyers.in/api/v3';
 
 app.post('/api/token', async (req, res) => {
     try {
-        const { authCode, clientId } = req.body;
+        const { authCode } = req.body;
+        
+        console.log('Auth Code received:', authCode ? 'Yes' : 'No');
+        console.log('App ID Hash:', process.env.FYERS_APP_ID_HASH ? 'Set' : 'Not Set');
         
         const response = await axios.post(FYERS_BASE + '/validate-authcode', {
             grant_type: 'authorization_code',
@@ -22,9 +25,14 @@ app.post('/api/token', async (req, res) => {
             code: authCode
         });
         
+        console.log('FYERS Response:', JSON.stringify(response.data));
         res.json(response.data);
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        console.error('Token Error:', e.response?.data || e.message);
+        res.status(500).json({ 
+            error: e.response?.data?.message || e.message,
+            details: e.response?.data || null
+        });
     }
 });
 
