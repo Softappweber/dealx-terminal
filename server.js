@@ -76,6 +76,10 @@ app.get('/api/positions', async (req, res) => {
     }
 });
 
+app.get('/callback', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
+
 app.listen(PORT, () => {
     console.log('TradeX Terminal running on port ' + PORT);
 });
