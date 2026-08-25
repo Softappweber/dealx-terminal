@@ -4,12 +4,18 @@ let watchlist = ['NSE:RELIANCE-EQ', 'NSE:TCS-EQ', 'NSE:INFY-EQ', 'NSE:HDFCBANK-E
 let currentSymbol = 'NSE:RELIANCE-EQ';
 let ws = null;
 
-async function loginWithFyers() {
-    const clientId = prompt('Enter FYERS Client ID:');
-    if (!clientId) return;
+function loginWithFyers() {
+    const appId = document.getElementById('appIdInput').value.trim();
+    if (!appId) { alert('FYERS App ID daalo!'); return; }
+    
+    localStorage.setItem('fyersAppId', appId);
     
     const redirectUri = window.location.origin + '/callback';
-    const authUrl = 'https://api-t1.fyers.in/api/v3/generate-authcode?client_id=' + clientId + '&redirect_uri=' + encodeURIComponent(redirectUri) + '&response_type=code&state=sample_state';
+    const authUrl = 'https://api-t1.fyers.in/api/v3/generate-authcode' +
+        '?client_id=' + appId +
+        '&redirect_uri=' + encodeURIComponent(redirectUri) +
+        '&response_type=code' +
+        '&state=sample_state';
     
     window.location.href = authUrl;
 }
