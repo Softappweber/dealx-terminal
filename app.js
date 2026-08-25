@@ -26,10 +26,10 @@ function loginWithFyers() {
     
     const redirectUri = window.location.origin + '/callback';
     const authUrl = 'https://api-t1.fyers.in/api/v3/generate-authcode' +
-        '?client_id=' + appId +
-        '&redirect_uri=' + encodeURIComponent(redirectUri) +
-        '&response_type=code' +
-        '&state=sample_state';
+    '?appId=' + appId +
+    '&redirect_uri=' + encodeURIComponent(redirectUri) +
+    '&response_type=code' +
+    '&state=sample_state';
     
     window.location.href = authUrl;
 }
